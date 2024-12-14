@@ -9,5 +9,4 @@ public class CryptoChangesNewBotApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CryptoChangesNewBotApplication.class, args);
 	}
-
 }

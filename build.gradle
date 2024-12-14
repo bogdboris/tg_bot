@@ -19,8 +19,12 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
-	implementation group: 'org.telegram', name: 'telegrambots', version: '6.5.0'
-	implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.telegram:telegrambots:6.5.0'
+	implementation 'org.jfree:jfreechart:1.5.3'
+	implementation 'org.json:json:20231013'
+	implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+	implementation 'org.jsoup:jsoup:1.14.3'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

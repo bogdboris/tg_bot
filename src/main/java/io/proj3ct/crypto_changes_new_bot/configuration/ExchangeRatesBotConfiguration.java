@@ -11,6 +11,7 @@ import io.proj3ct.crypto_changes_new_bot.bot.ExchangeRatesBot;
 @Configuration
 public class ExchangeRatesBotConfiguration {
 
+
     @Bean
     public TelegramBotsApi telegramBotsApi(ExchangeRatesBot exchangeRatesBot) throws TelegramApiException {
         var api = new TelegramBotsApi(DefaultBotSession.class);
@@ -21,5 +22,4 @@ public class ExchangeRatesBotConfiguration {
     public OkHttpClient okHttpClient() {
         return new OkHttpClient();
     }
-
 }
