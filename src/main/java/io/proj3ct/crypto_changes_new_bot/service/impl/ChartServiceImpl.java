@@ -240,4 +240,24 @@ public class ChartServiceImpl implements ChartService {
     public String getForecast(String currencyCode) throws ServiceException {
         return currencyClient.getForecast(currencyCode);
     }
+
+    public String compareCurrentPriceWithSMA(String symbol) throws ServiceException, IOException {
+        String historicalData = currencyClient.getHistoricalData(symbol, "5min", "compact");
+        Map<String, Double> historicalParsedData = parseData(historicalData);
+
+        String smaData = currencyClient.getSMAData(symbol, "5min", 10, "open");
+        Map<String, Double> smaParsedData = parseSMAData(smaData);
+
+        // Получаем последнюю цену из исторических данных
+        double lastPrice = historicalParsedData.values().stream().reduce((first, second) -> second).orElse(0.0);
+
+        // Получаем последнюю SMA
+        double lastSMA = smaParsedData.values().stream().reduce((first, second) -> second).orElse(0.0);
+
+        if (lastPrice > lastSMA) {
+            return "Текущая цена " + symbol + " выше, чем SMA.";
+        } else {
+            return "Текущая цена " + symbol + " ниже, чем SMA.";
+        }
+    }
 }
