@@ -111,4 +111,21 @@ public class CurrencyClient {
             throw new ServiceException("Error fetching currency change data", e);
         }
     }
+
+    public String getRSIData(String symbol, String interval, int timePeriod, String seriesType) throws ServiceException {
+        String url = String.format("https://www.alphavantage.co/query?function=RSI&symbol=%s&interval=%s&time_period=%d&series_type=%s&apikey=%s",
+                symbol, interval, timePeriod, seriesType, apiKey);
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new ServiceException("Ошибка получения данных RSI: " + response.message());
+            }
+            return response.body().string();
+        } catch (IOException e) {
+            throw new ServiceException("Ошибка получения данных RSI", e);
+        }
+    }
 }

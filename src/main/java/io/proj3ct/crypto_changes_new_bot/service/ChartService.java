@@ -15,4 +15,5 @@ public interface ChartService {
     String getForecast(String currencyCode) throws ServiceException;
     File createSMAChart(String symbol, String interval, int timePeriod, String seriesType) throws ServiceException, IOException;
     String compareCurrentPriceWithSMA(String symbol) throws ServiceException, IOException;
+    String getRSIStatus(String symbol) throws ServiceException, IOException;
 }

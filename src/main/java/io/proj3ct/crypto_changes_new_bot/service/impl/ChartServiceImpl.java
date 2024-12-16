@@ -107,7 +107,7 @@ public class ChartServiceImpl implements ChartService {
     @Override
     public File createChart(String symbol, String interval, String outputsize) throws ServiceException, IOException {
         String data = currencyClient.getHistoricalData(symbol, interval, outputsize);
-        LOG.info("Received data: {}", data); // Логирование полученных данных
+        LOG.info("Received data for chart: {}", data); // Логирование полученных данных
 
         // Парсинг данных и создание датасета
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
@@ -138,6 +138,7 @@ public class ChartServiceImpl implements ChartService {
 
         // Сохранение графика в файл
         File chartFile = File.createTempFile(symbol, ".png");
+        LOG.info("Chart file created: {}", chartFile.getAbsolutePath()); // Логирование пути к файлу графика
         ChartUtils.saveChartAsPNG(chartFile, chart, 800, 600); // Увеличение размера графика
         return chartFile;
     }
@@ -146,12 +147,12 @@ public class ChartServiceImpl implements ChartService {
     public File createSMAChart(String symbol, String interval, int timePeriod, String seriesType) throws ServiceException, IOException {
         // Получение данных для обычного графика
         String historicalData = currencyClient.getHistoricalData(symbol, interval, "compact");
-        LOG.info("Received historical data: {}", historicalData); // Логирование полученных данных
+        LOG.info("Received historical data for SMA chart: {}", historicalData); // Логирование полученных данных
         Map<String, Double> historicalParsedData = parseData(historicalData);
 
         // Получение данных для графика SMA
         String smaData = currencyClient.getSMAData(symbol, interval, timePeriod, seriesType);
-        LOG.info("Received SMA data: {}", smaData); // Логирование полученных данных
+        LOG.info("Received SMA data for SMA chart: {}", smaData); // Логирование полученных данных
         Map<String, Double> smaParsedData = parseSMAData(smaData);
 
         // Создание датасета
@@ -189,6 +190,7 @@ public class ChartServiceImpl implements ChartService {
 
         // Сохранение графика в файл
         File chartFile = File.createTempFile(symbol, ".png");
+        LOG.info("SMA Chart file created: {}", chartFile.getAbsolutePath()); // Логирование пути к файлу графика
         ChartUtils.saveChartAsPNG(chartFile, chart, 800, 600); // Увеличение размера графика
         return chartFile;
     }
@@ -258,6 +260,32 @@ public class ChartServiceImpl implements ChartService {
             return "Текущая цена " + symbol + " выше, чем SMA.";
         } else {
             return "Текущая цена " + symbol + " ниже, чем SMA.";
+        }
+    }
+
+    @Override
+    public String getRSIStatus(String symbol) throws ServiceException, IOException {
+        String rsiData = currencyClient.getRSIData(symbol, "weekly", 10, "open");
+        JSONObject jsonObject = new JSONObject(rsiData);
+
+        if (jsonObject.has("Technical Analysis: RSI")) {
+            JSONObject rsiDataObject = jsonObject.getJSONObject("Technical Analysis: RSI");
+            double lastRSI = 0.0;
+            for (String key : rsiDataObject.keySet()) {
+                JSONObject value = rsiDataObject.getJSONObject(key);
+                lastRSI = value.getDouble("RSI");
+            }
+
+            if (lastRSI >= 70) {
+                return "находится в состоянии перекупленности " + symbol + ": " + lastRSI;
+            } else if (lastRSI <= 30) {
+                return "находится в зоне скидок " + symbol + ": " + lastRSI;
+            } else {
+                return "находится в оптимальной зоне " + symbol + ": " + lastRSI;
+            }
+        } else {
+            LOG.error("RSI data not found in JSON response");
+            throw new ServiceException("RSI data not found");
         }
     }
 }
