@@ -277,11 +277,11 @@ public class ChartServiceImpl implements ChartService {
             }
 
             if (lastRSI >= 70) {
-                return "находится в состоянии перекупленности " + symbol + ": " + lastRSI;
+                return symbol + " находится в состоянии перекупленности " + ": " + lastRSI;
             } else if (lastRSI <= 30) {
-                return "находится в зоне скидок " + symbol + ": " + lastRSI;
+                return symbol + " находится в зоне скидок " + ": " + lastRSI;
             } else {
-                return "находится в оптимальной зоне " + symbol + ": " + lastRSI;
+                return symbol + " находится в оптимальной зоне " + ": " + lastRSI;
             }
         } else {
             LOG.error("RSI data not found in JSON response");

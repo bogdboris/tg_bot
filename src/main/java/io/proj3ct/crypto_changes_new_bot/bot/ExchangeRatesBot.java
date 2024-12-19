@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -41,9 +40,6 @@ public class ExchangeRatesBot extends TelegramLongPollingBot {
 
     @Value("${bot.token}")
     private String botToken;
-
-    @Value("${chat.id}")
-    private Long chatId;
 
     public ExchangeRatesBot(@Value("${bot.token}") String botToken) {
         super(botToken);
@@ -100,13 +96,13 @@ public class ExchangeRatesBot extends TelegramLongPollingBot {
             formattedText = String.format(text, LocalDate.now(), usd);
             sendMessage(chatId, formattedText);
 
-            File chartFile = chartService.createChart("USD", "5min", "compact");
+            File chartFile = chartService.createChart("USDRUB", "30min", "compact");
             sendPhoto(chatId, chartFile);
 
-            String comparisonResult = chartService.compareCurrentPriceWithSMA("USD");
+            String comparisonResult = chartService.compareCurrentPriceWithSMA("USDRUB");
             sendMessage(chatId, comparisonResult);
 
-            String rsiStatus = chartService.getRSIStatus("USD");
+            String rsiStatus = chartService.getRSIStatus("USDRUB");
             sendMessage(chatId, rsiStatus);
 
             try {
@@ -281,17 +277,6 @@ public class ExchangeRatesBot extends TelegramLongPollingBot {
             execute(sendPhoto);
         } catch (TelegramApiException e) {
             LOG.error("Ошибка отправки фото", e);
-        }
-    }
-
-    @Scheduled(cron = "0 15 2 * *", zone = "Asia/Yekaterinburg")
-    public void sendDailyCurrencyChange() {
-        try {
-            String currencyChange = currencyClient.getCurrencyChange();
-            String message = "Изменение курса доллара за последний день: " + currencyChange;
-            sendMessage(chatId, message);
-        } catch (ServiceException e) {
-            LOG.error("Ошибка получения изменения курса доллара", e);
         }
     }
 }
